@@ -1,0 +1,13 @@
+rumps
+sounddevice
+numpy
+scipy
+pynput
+mlx-whisper
+parakeet-mlx
+mlx-audio
+misaki
+num2words
+supertonic
+requests
+pyperclip

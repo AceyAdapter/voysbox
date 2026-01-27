@@ -1,3 +1,5 @@
 .env
 plans
 .claude
+venv
+__pycache__
