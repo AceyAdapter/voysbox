@@ -86,14 +86,17 @@ def _load_kokoro():
     global _loaded_tts_model
 
     # Try multiple loading strategies
-    # Strategy 1: KokoroPipeline from mlx_audio (direct import, bypasses load_model)
+    # Strategy 1: KokoroPipeline from mlx_audio (direct import with properly loaded model)
     try:
         log.info("_load_kokoro: Trying KokoroPipeline from mlx_audio.tts.models.kokoro...")
         from mlx_audio.tts.models.kokoro import KokoroPipeline
-        log.info("_load_kokoro: KokoroPipeline imported, creating pipeline (lang_code='a')...")
+        from mlx_audio.tts.utils import load_model as load_tts_model
+        log.info("_load_kokoro: Loading model weights from mlx-community/Kokoro-82M-bf16...")
+        model = load_tts_model("mlx-community/Kokoro-82M-bf16")
+        log.info("_load_kokoro: Model loaded, creating pipeline (lang_code='a')...")
         pipeline = KokoroPipeline(
             lang_code="a",
-            model=True,
+            model=model,
             repo_id="mlx-community/Kokoro-82M-bf16",
         )
         _loaded_tts_model = ("kokoro_pipeline", pipeline)
@@ -175,11 +178,13 @@ def _synthesize_kokoro(text: str, voice: str) -> tuple[np.ndarray, int]:
 
     if model_type == "kokoro_pipeline":
         # mlx_audio KokoroPipeline: yields (graphemes, phonemes, audio)
+        # audio is an mx.array with shape (1, time) — squeeze to 1D
         log.debug("_synthesize_kokoro: Generating via KokoroPipeline...")
         audio_segments = []
         for graphemes, phonemes, audio_chunk in model(text, voice=voice, speed=1.0):
-            log.debug("_synthesize_kokoro: Got chunk — %d samples", len(audio_chunk))
-            audio_segments.append(audio_chunk)
+            chunk = np.array(audio_chunk).squeeze()
+            log.debug("_synthesize_kokoro: Got chunk — %d samples", len(chunk))
+            audio_segments.append(chunk)
 
         if not audio_segments:
             log.warning("_synthesize_kokoro: No audio segments generated")

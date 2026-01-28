@@ -28,7 +28,15 @@ DEFAULT_CONFIG = {
     "llm": {
         "endpoint": "http://localhost:1234/v1/chat/completions",
         "model": "local-model",
-        "system_prompt": "You are a helpful voice assistant. Keep responses concise and conversational.",
+        "system_prompt": (
+            "You are a voice assistant running on the user's Mac. "
+            "Your responses are spoken aloud via text-to-speech, so keep them short, natural, and conversational — "
+            "avoid markdown, bullet lists, code blocks, or other visual formatting. "
+            "Prefer plain, spoken-style language. "
+            "If a question is ambiguous, give a brief, practical answer rather than listing every possibility. "
+            "Do not use emojis. "
+            "When you don't know something, say so plainly."
+        ),
     },
 }
 
